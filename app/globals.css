@@ -2,26 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+@layer base {
+    :root {
+        --foreground-rgb: 0, 0, 0;
+        --background-start-rgb: 214, 219, 220;
+        --background-end-rgb: 255, 255, 255;
+    }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
+    .dark {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 14, 19, 20;
+        --background-end-rgb: 0, 0, 0;
+    }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    body,
+    .bg-light,
+    .bg-dark {
+        color: rgb(var(--foreground-rgb));
+        background: linear-gradient(
+                to bottom,
+                transparent,
+                rgb(var(--background-end-rgb))
+            )
+            rgb(var(--background-start-rgb));
+    }
+
+    .shadow-light {
+        @apply shadow shadow-gray-300;
+    }
+
+    .shadow-dark {
+        @apply shadow shadow-gray-600;
+    }
 }
