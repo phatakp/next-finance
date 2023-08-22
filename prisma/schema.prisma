@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      Password?
+  isAdmin       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  bankaccts    BankAcct[]
+  groups       Group[]
+  transactions Transaction[]
+}
+
+model Password {
+  hash   String
+  userId String @map("_id") @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId])
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+type Bank {
+  id   String
+  name String
+  type String
+}
+
+type Category {
+  id   String
+  name String
+  type String
+}
+
+enum TxnType {
+  Income
+  Transfer
+  Expense
+}
+
+model BankAcct {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  number      String
+  defaultAcct Boolean @default(false)
+  balance     Float   @default(0)
+  currvalue   Float   @default(0)
+  bank        Bank
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sourceTxns Transaction[] @relation("SourceTxns")
+  destTxns   Transaction[] @relation("DestinationTxns")
+
+  @@unique([number, bank.name, userId])
+}
+
+model Group {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String        @unique
+  transactions Transaction[]
+
+  userIds String[] @db.ObjectId
+  users   User     @relation(fields: [userIds], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  type        TxnType
+  date        DateTime @default(now())
+  amount      Float
+  description String?
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category Category?
+
+  sourceId String?   @db.ObjectId
+  source   BankAcct? @relation("SourceTxns", fields: [sourceId], references: [id], onDelete: Cascade)
+
+  destinationId String?   @db.ObjectId
+  destination   BankAcct? @relation("DestinationTxns", fields: [destinationId], references: [id], onDelete: Cascade)
+
+  groupName String?
+  group     Group?  @relation(fields: [groupName], references: [name], onDelete: SetNull)
+}
