@@ -10,12 +10,16 @@ import {
   ReactNode,
   SetStateAction,
   createContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
 } from "react";
 
 type TxnContextProps = {
+  query: string;
+  setQuery: Dispatch<SetStateAction<string>>;
+  getQuery: (query: string) => void;
   grpOptions: ReactSelectOptions | undefined;
   srcOptions: ReactSelectGrpOptions | undefined;
   setSrcOptions: Dispatch<SetStateAction<ReactSelectGrpOptions | undefined>>;
@@ -36,6 +40,7 @@ export default function TxnContextProvider({
   initTxns: APITxnResponse[] | undefined;
 }) {
   const [txns, setTxns] = useState(initTxns);
+  const [query, setQuery] = useState<string>("");
   const [srcBalance, setSrcBalance] = useState(0);
   const [grpOptions, setGrpOptions] = useState<ReactSelectOptions | undefined>(
     []
@@ -46,6 +51,8 @@ export default function TxnContextProvider({
   const [destOptions, setDestOptions] = useState<
     ReactSelectGrpOptions | undefined
   >([]);
+
+  const getQuery = useCallback((query: string) => setQuery(query), []);
 
   useEffect(() => {
     async function fetchGrpOptions() {
@@ -66,6 +73,9 @@ export default function TxnContextProvider({
       setSrcBalance,
       txns,
       setTxns,
+      query,
+      setQuery,
+      getQuery,
     }),
     [
       grpOptions,
@@ -77,6 +87,9 @@ export default function TxnContextProvider({
       setSrcBalance,
       txns,
       setTxns,
+      query,
+      setQuery,
+      getQuery,
     ]
   );
   return <TxnContext.Provider value={value}>{children}</TxnContext.Provider>;

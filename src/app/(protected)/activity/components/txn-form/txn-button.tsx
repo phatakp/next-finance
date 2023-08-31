@@ -40,6 +40,9 @@ const TxnButton: FC<TxnButtonProps> = ({
         >
           {icon ?? <Plus className="w-5 h-5" />}{" "}
           <span className="hidden sm:flex">{text ?? (action as string)}</span>
+          {!text && action === FormAction.Add && (
+            <span className="sm:hidden">Add</span>
+          )}
         </div>
       }
       title={`${action as string} Transaction`}

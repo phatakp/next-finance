@@ -1,15 +1,27 @@
 "use client";
 
-import { APITxnResponse } from "@/types/app";
+import { useContext } from "react";
 import TxnCard from "./txn-card";
+import { TxnContext } from "./txn-provider";
 
-const TxnList = ({ txns }: { txns: APITxnResponse[] | undefined }) => {
+const TxnList = () => {
+  const { txns, query } = useContext(TxnContext);
+  const txnData =
+    query.length > 2
+      ? txns?.filter(
+          (txn) =>
+            txn?.description?.toLowerCase().includes(query.toLowerCase()) ||
+            txn.category?.name.toLowerCase().includes(query.toLowerCase()) ||
+            txn.category?.type.toLowerCase().includes(query.toLowerCase())
+        )
+      : txns;
+
   return (
     <div className="w-full space-y-8">
-      {(!txns || txns.length === 0) && (
+      {(!txnData || txnData.length === 0) && (
         <div className="text-lg font-medium">No transactions to display!</div>
       )}
-      {txns?.map((txn, i, txns) => (
+      {txnData?.map((txn, i, txns) => (
         <div key={txn.id} className="flex flex-col gap-4">
           {/* Txn Date */}
           {(i === 0 ||

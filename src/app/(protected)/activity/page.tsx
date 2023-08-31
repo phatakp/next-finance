@@ -1,8 +1,8 @@
-"use client";
+import { getUserTxns } from "@/app/api/_actions/transactions";
 import { Metadata } from "next";
-import { FC, useCallback, useContext, useState } from "react";
+import { FC } from "react";
 import TxnList from "./components/txn-list";
-import { TxnContext } from "./components/txn-provider";
+import TxnContextProvider from "./components/txn-provider";
 import TxnSearch from "./components/txn-search";
 
 export const metadata: Metadata = {
@@ -12,29 +12,16 @@ export const metadata: Metadata = {
 
 type ActivityPageProps = {};
 
-const ActivityPage: FC<ActivityPageProps> = ({}) => {
-  const { txns } = useContext(TxnContext);
-  const [query, setQuery] = useState<string>("");
-
-  const getQuery = useCallback((query: string) => setQuery(query), []);
-
-  const txnData =
-    query.length > 2
-      ? txns?.filter(
-          (txn) =>
-            txn?.description?.toLowerCase().includes(query.toLowerCase()) ||
-            txn.category?.name.toLowerCase().includes(query.toLowerCase()) ||
-            txn.category?.type.toLowerCase().includes(query.toLowerCase())
-        )
-      : txns;
+const ActivityPage: FC<ActivityPageProps> = async ({}) => {
+  const { data: transactions } = await getUserTxns();
 
   return (
-    <>
-      <TxnSearch getQuery={getQuery} />
+    <TxnContextProvider initTxns={transactions}>
+      <TxnSearch />
       <div className="rounded-xl border border-input md:p-8 px-3 py-8 shadow-mg shadow-background">
-        <TxnList txns={txnData} />
+        <TxnList />
       </div>
-    </>
+    </TxnContextProvider>
   );
 };
 
