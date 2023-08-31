@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { APIBankAcctResponse, FormAction } from "@/types/app";
 import { Plus } from "lucide-react";
 import { FC, ReactNode } from "react";
-import AccountForm from "./index.";
+import AccountForm from ".";
 
 type AccountButtonProps = {
   acct?: APIBankAcctResponse;

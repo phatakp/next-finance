@@ -14,6 +14,7 @@ import {
   ReactNode,
   SetStateAction,
   createContext,
+  useCallback,
   useState,
 } from "react";
 
@@ -35,7 +36,7 @@ export const ModalContext = createContext({} as ModalContextProps);
 const Modal: FC<ModalProps> = ({ trigger, children }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const getTitle = (title: string) => setTitle(title);
+  const getTitle = useCallback((title: string) => setTitle(title), []);
 
   return (
     <ModalContext.Provider value={{ open, setOpen, getTitle }}>

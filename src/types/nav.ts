@@ -1,11 +1,12 @@
-import { Icons } from "@/components/shared/icons";
+import { StaticImageData } from "next/image";
 
 export type NavItem = {
   title: string;
   href?: string;
   disabled?: boolean;
   external?: boolean;
-  icon?: keyof typeof Icons;
+  // icon?: keyof typeof Icons;
+  icon?: StaticImageData;
   label?: string;
 };
 

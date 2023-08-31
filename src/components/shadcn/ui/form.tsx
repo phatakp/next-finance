@@ -94,7 +94,7 @@ const FormLabel = React.forwardRef<
     <Label
       ref={ref}
       className={cn(
-        "absolute text-accent-foreground font-fira duration-300 transform -translate-y-4 scale-90 top-4 z-10 origin-[0] left-2.5 peer-focus:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-90 peer-focus:-translate-y-4 peer-disabled:text-muted-foreground",
+        "absolute text-primary font-fira duration-300 transform -translate-y-4 scale-90 top-4 z-10 origin-[0] left-2.5 peer-focus:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-90 peer-focus:-translate-y-4 peer-disabled:text-muted-foreground",
         error && "text-destructive border-destructive",
         className
       )}

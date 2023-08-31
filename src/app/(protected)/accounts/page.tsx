@@ -4,29 +4,26 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/shadcn/ui/tabs";
-import Modal from "@/components/shared/modal";
 import { getAcctsByType } from "@/lib/utils";
-import { FormAction } from "@/types/app";
-import { Metadata } from "next";
+import { AcctType } from "@/types/app";
 import { FC } from "react";
 import { toast } from "react-hot-toast";
-import AccountCard from "./components/account-card";
-import AccountForm from "./components/account-form/index.";
+import AcctCarousel from "./components/acct-carousel";
+import AcctTotCard from "./components/acct-tot-card";
+import AcctTxns from "./components/acct-txns";
 
-export const metadata: Metadata = {
-  title: "Accounts | Expensio",
-  description: "Personal Expense Tracker Accounts",
+type AccountsPageProps = {
+  searchParams: any;
 };
 
-type AccountsPageProps = {};
-
-const AccountsPage: FC<AccountsPageProps> = async ({}) => {
+const AccountsPage: FC<AccountsPageProps> = async ({ searchParams }) => {
   const acctsByType = await getAcctsByType();
+  const type = searchParams?.type;
 
   if (acctsByType.length === 0) return toast.error("Error fetching accounts!");
 
   return (
-    <Tabs defaultValue={acctsByType.at(0)!.type} className="w-full">
+    <Tabs defaultValue={type ?? "Savings"} className="w-full px-0">
       <TabsList>
         {acctsByType?.map((grp) => (
           <TabsTrigger key={grp.type} value={grp.type}>
@@ -37,19 +34,12 @@ const AccountsPage: FC<AccountsPageProps> = async ({}) => {
       {acctsByType?.map((grp) => (
         <TabsContent key={grp.type} value={grp.type}>
           <div className="flex flex-col gap-4">
-            <span>{grp.totBal}</span>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              {grp?.accts?.map((acct) => (
-                <Modal
-                  key={acct.id}
-                  trigger={<AccountCard key={acct.id} acct={acct} />}
-                  title="Update Account"
-                  desc="Confirm details to update account"
-                >
-                  <AccountForm formAction={FormAction.Update} acct={acct} />
-                </Modal>
-              ))}
-            </div>
+            <AcctTotCard
+              total={grp.type === AcctType.Investment ? grp.totVal : grp.totBal}
+              type={grp.type}
+            />
+            <AcctCarousel grp={grp} />
+            <AcctTxns type={grp.type as AcctType} />
           </div>
         </TabsContent>
       ))}

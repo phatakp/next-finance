@@ -3,6 +3,7 @@ import SiteHeader from "@/components/shared/site-header";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Fira_Sans, Inter } from "next/font/google";
+import "pure-react-carousel/dist/react-carousel.es.css";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -25,6 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head />
       <body className={cn(inter.variable, fira.variable)}>
         <AppProvider>
           <Toaster />

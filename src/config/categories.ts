@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { CatType } from "../types/app";
+import { CatType, Category } from "../types/app";
 
 const categories = [
   { type: CatType.Food, names: ["Groceries", "Restaurant", "Online", "Other"] },
@@ -63,5 +63,4 @@ const catData = categories.map(({ type, names }) =>
     type,
   }))
 );
-
-export default catData.flatMap((d) => d);
+export default catData.flatMap((d) => d) as Category[];

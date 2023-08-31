@@ -1,4 +1,3 @@
-import { Icons } from "@/components/shared/icons";
 import { Metadata } from "next";
 import Image from "next/image";
 import authBg from "./components/auth.png";
@@ -15,12 +14,17 @@ export default function AuthLayout({
 }) {
   return (
     <section className="flex items-center justify-center">
-      <div className="flex items-center justify-center pt-32 lg:pt-0">
+      <div className="flex items-center justify-center pt-12">
         <div className="sm:container rounded  max-w-4xl w-full md:mt-8">
           <div className="grid lg:grid-cols-2 p-2 md:py-4 gap-4">
-            <div className="flex flex-col gap-2 bg-primary container rounded-md py-2 md:py-8 justify-center items-center">
+            <div className="flex flex-col gap-2  bg-primary container rounded-md py-2 md:py-8 justify-center items-center">
               <div className="flex flex-col sm:flex-row items-center justify-center flex-wrap">
-                <Icons.logo className="w-12 h-12" />
+                <Image
+                  src="https://finance-categories.s3.ap-south-1.amazonaws.com/logo.svg"
+                  alt=""
+                  width={100}
+                  height={100}
+                />
                 <p className="flex-1 font-bold text-3xl sm:text-4xl text-white ml-4 text-center font-fira">
                   Track expenses with us
                 </p>

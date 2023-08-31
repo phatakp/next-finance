@@ -16,6 +16,7 @@ interface SelectProps extends ComponentPropsWithoutRef<typeof ReactSelect> {
 }
 
 const Select: FC<SelectProps> = ({
+  className,
   name,
   label,
   desc,
@@ -34,7 +35,7 @@ const Select: FC<SelectProps> = ({
       control={control}
       name={name!}
       render={({ field: { onChange, value } }) => (
-        <FormItem className="relative">
+        <FormItem className={cn("relative", className)}>
           <FormControl>
             <ReactSelect
               placeholder="Select a value.."
@@ -74,9 +75,12 @@ const Select: FC<SelectProps> = ({
                 input: () => "pl-3",
                 valueContainer: () => "px-1 gap-2",
                 clearIndicator: () =>
-                  "border border-background bg-card hover:bg-card-hover text-card-foreground rounded-md",
+                  cn(
+                    "border border-background bg-card hover:bg-card-hover text-card-foreground rounded-md",
+                    error && "text-destructive"
+                  ),
                 dropdownIndicator: () =>
-                  cn(isDisabled ? "text-muted-foreground" : ""),
+                  cn(isDisabled && "text-muted-foreground"),
                 menu: () =>
                   cn(
                     "p-1 mt-2 border border-background bg-accent text-accent-foreground rounded-lg text-sm z-[99] absolute"
@@ -85,19 +89,19 @@ const Select: FC<SelectProps> = ({
 
                 control: ({ isFocused, isDisabled }) =>
                   cn(
-                    "block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm  bg-background border-0 border-b-2 border-input appearance-none peer",
+                    "block rounded-t-lg px-2 pb-2.5 pt-5 w-full text-sm  bg-background border-0 border-b-2 border-input appearance-none peer",
                     isFocused && "outline-none ring-0 border-primary",
                     isDisabled && "cursor-not-allowed opacity-50",
-                    !!error && "border-destructive"
+                    !!error && "border-destructive text-destructive"
                   ),
                 groupHeading: () =>
                   "text-base text-foreground font-bold p-2 border-b border-input uppercase",
 
                 option: ({ isFocused, isSelected }) =>
                   cn(
-                    "hover:cursor-pointer px-3 py-2 rounded z-[99]",
+                    "hover:cursor-pointer px-3 py-2 rounded z-[99] text-foreground/80",
                     isFocused &&
-                      "bg-primary text-primary-foreground active:bg-primary active:text-white",
+                      "bg-primary text-primary-foreground active:bg-primary active:text-primary-foreground",
                     isSelected &&
                       "before:content-['✔'] before:mr-2 before:text-green-500"
                   ),
@@ -116,13 +120,14 @@ const Select: FC<SelectProps> = ({
           <FormLabel
             className={cn(
               "text-primary",
-              isDisabled && "text-muted-foreground opacity-70"
+              isDisabled && "text-muted-foreground opacity-70",
+              error && "text-destructive"
             )}
           >
             {label}
           </FormLabel>
-          <FormDescription>{desc}</FormDescription>
-          <FormMessage />
+          <FormDescription className="pl-3">{desc}</FormDescription>
+          <FormMessage>{error}</FormMessage>
         </FormItem>
       )}
     />

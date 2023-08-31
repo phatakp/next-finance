@@ -5,18 +5,31 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/shadcn/ui/sheet";
-import { Icons } from "@/components/shared/icons";
 import { docsConfig } from "@/config/docs";
 import { siteConfig } from "@/config/site";
-import { cn } from "@/lib/utils";
-import { MainNavItem } from "@/types/nav";
+import { cn, getAcctTypes } from "@/lib/utils";
+import { AcctType } from "@/types/app";
 import { PanelLeftOpen } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
+import { Icons } from "./icons";
+import UserAvatar from "./user-avatar";
 
 export function MobileNav() {
+  const [types, setTypes] = React.useState<string[]>([]);
   const [open, setOpen] = React.useState(false);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    async function fetch() {
+      const t = await getAcctTypes();
+      setTypes(t);
+    }
+    fetch();
+  }, []);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -29,17 +42,36 @@ export function MobileNav() {
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="pr-0">
+      <SheetContent
+        side="left"
+        className="grid items-center justify-center w-full"
+      >
         <MobileLink
           href="/"
-          className="flex items-center"
+          className="flex items-center hover:bg-transparent opacity-100 w-full"
           onOpenChange={setOpen}
         >
-          <Icons.logo className="mr-2 h-4 w-4" />
-          <span className="font-bold">{siteConfig.name}</span>
+          <Image
+            src="https://finance-categories.s3.ap-south-1.amazonaws.com/logo.svg"
+            alt=""
+            width={40}
+            height={40}
+          />
+          <span className="font-bold text-lg">{siteConfig.name}</span>
         </MobileLink>
-        <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-          <div className="flex flex-col space-y-3">
+
+        <UserAvatar image={session!.user.image} className="w-24 h-24 mx-auto" />
+
+        <div className="flex flex-col mx-auto">
+          <span className="text-sm text-muted-foreground mx-auto">
+            Welcome back
+          </span>
+          <span className="font-semibold mx-auto">{session?.user.name}</span>
+        </div>
+
+        {/* Main Navigation Items */}
+        <div className="my-4 h-[calc(100vh-8rem)] pb-10 w-full">
+          <div className="grid items-center justify-center w-full space-y-4">
             {docsConfig.mainNav?.map(
               (item) =>
                 item.href && (
@@ -48,34 +80,34 @@ export function MobileNav() {
                     href={item.href}
                     onOpenChange={setOpen}
                   >
+                    <Image
+                      src={`https://finance-categories.s3.ap-south-1.amazonaws.com/${item.title.toLowerCase()}.png`}
+                      alt=""
+                      width={32}
+                      height={32}
+                    />
                     {item.title}
                   </MobileLink>
                 )
             )}
           </div>
-          <div className="flex flex-col space-y-2">
-            {docsConfig.sidebarNav.map((item, index) => (
-              <div key={index} className="flex flex-col space-y-3 pt-6">
-                <h4 className="font-medium">{item.title}</h4>
-                {item?.items?.length &&
-                  item.items.map((item: MainNavItem) => (
-                    <React.Fragment key={item.href}>
-                      {!item.disabled &&
-                        (item.href ? (
-                          <MobileLink
-                            href={item.href}
-                            onOpenChange={setOpen}
-                            className="text-muted-foreground"
-                          >
-                            {item.title}
-                          </MobileLink>
-                        ) : (
-                          item.title
-                        ))}
-                    </React.Fragment>
-                  ))}
-              </div>
-            ))}
+
+          <div className="grid items-center justify-center w-full space-y-4 mt-8">
+            <h4 className="font-medium px-4">Accounts</h4>
+            {types?.length &&
+              types.map((type: string) => (
+                <MobileLink
+                  key={type}
+                  href={{
+                    pathname: "/accounts",
+                    query: { type },
+                  }}
+                  onOpenChange={setOpen}
+                >
+                  {getSvg(type as AcctType)}
+                  {type}
+                </MobileLink>
+              ))}
           </div>
         </div>
       </SheetContent>
@@ -104,10 +136,28 @@ function MobileLink({
         router.push(href as string);
         onOpenChange?.(false);
       }}
-      className={cn(className)}
+      className={cn(
+        "flex items-center gap-4 opacity-90 hover:text-primary text-accent-foreground px-4 py-2 w-full transition-all duration-300 ease-in-out hover:scale-105",
+        className
+      )}
       {...props}
     >
       {children}
     </Link>
   );
+}
+
+export function getSvg(type: AcctType) {
+  switch (type) {
+    case AcctType.Wallet:
+      return <Icons.wallet />;
+    case AcctType.Investment:
+      return <Icons.investment />;
+    case AcctType.Mortgage:
+      return <Icons.mortgage />;
+    case AcctType.CreditCard:
+      return <Icons.creditcard />;
+    default:
+      return <Icons.savings />;
+  }
 }

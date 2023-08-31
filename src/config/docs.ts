@@ -1,4 +1,3 @@
-import { AcctType } from "../types/app";
 import { MainNavItem, SidebarNavItem } from "../types/nav";
 
 interface DocsConfig {
@@ -28,11 +27,13 @@ export const docsConfig: DocsConfig = {
   sidebarNav: [
     {
       title: "Accounts",
-      items: Object.keys(AcctType).map((type) => ({
-        title: type,
-        href: `/accounts/${type.toLowerCase()}`,
-        items: [],
-      })),
+      items: [
+        {
+          title: "",
+          href: `/accounts`,
+          items: [],
+        },
+      ],
     },
   ],
 };

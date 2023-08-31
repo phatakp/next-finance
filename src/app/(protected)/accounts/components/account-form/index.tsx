@@ -3,18 +3,25 @@
 import {
   BankAcctFormData,
   BankAcctFormSchema,
-  formDefaultValues,
-} from "@/app/(protected)/accounts/components/account-form/zod-schema";
+  acctFormDefaultValues,
+} from "@/app/(protected)/accounts/components/account-form/acct-zod-schema";
 import { processAccountAction } from "@/app/api/_actions/accounts";
 import { Button } from "@/components/shadcn/ui/button";
-import { Form } from "@/components/shadcn/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/shadcn/ui/form";
 import { Input } from "@/components/shadcn/ui/input";
+import { Switch } from "@/components/shadcn/ui/switch";
 import { ModalContext } from "@/components/shared/modal";
 import Select from "@/components/shared/select";
 import banks from "@/config/banks";
 import { APIBankAcctResponse, AcctType, FormAction } from "@/types/app";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { FC, useContext, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -31,18 +38,17 @@ const AccountForm: FC<AccountFormProps> = ({ acct, formAction }) => {
   const { setOpen, getTitle } = useContext(ModalContext);
   const form = useForm<BankAcctFormData>({
     resolver: zodResolver(BankAcctFormSchema),
-    defaultValues: formDefaultValues(formAction, acct),
+    defaultValues: acctFormDefaultValues(formAction, acct),
   });
   const type = form.watch("type");
   const action = form.watch("action");
-  const router = useRouter();
   const bankOptions = banks
     .filter((bank) => bank.type === type.value)
     .map((b) => ({ value: b.id, label: b.name }));
 
   useEffect(() => {
     getTitle(`${form.getValues("action")} account`);
-  }, [action]);
+  }, [action, form, getTitle]);
 
   const processForm: SubmitHandler<BankAcctFormData> = async (formData) => {
     try {
@@ -61,13 +67,12 @@ const AccountForm: FC<AccountFormProps> = ({ acct, formAction }) => {
         );
         form.reset();
         setOpen(false);
-        router.refresh();
       }
     } catch (error: any) {
       console.log(error);
 
       if (error instanceof ZodError) return toast.error(error.message);
-      else return toast.error("Invalid Credentials");
+      else return toast.error("Could not process action");
     }
   };
 
@@ -77,6 +82,27 @@ const AccountForm: FC<AccountFormProps> = ({ acct, formAction }) => {
         className="w-full flex flex-col gap-8 lg:min-h-[30vh] relative"
         onSubmit={form.handleSubmit(processForm)}
       >
+        <FormField
+          control={form.control}
+          name="defaultAcct"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between p-4">
+              <div className="space-y-0.5 flex flex-col">
+                <FormLabel className="text-base">Default Account</FormLabel>
+                <FormDescription className="-ml-1">
+                  Primary account for all transactions
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
         <div className="grid w-full gap-8 md:grid-cols-2">
           {/* Account Type Field */}
           <Select

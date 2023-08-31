@@ -1,6 +1,6 @@
+import { defaultBank } from "@/lib/utils";
 import { APIBankAcctResponse, AcctType, FormAction } from "@/types/app";
 import { z } from "zod";
-import { defaultBank } from "../../../../../lib/utils";
 
 const AcctTypeSchema = z.object({
   value: z.nativeEnum(AcctType),
@@ -16,6 +16,7 @@ export const BankAcctFormSchema = z
   .object({
     id: z.string().optional(),
     action: z.nativeEnum(FormAction),
+    defaultAcct: z.boolean().default(false),
     type: AcctTypeSchema,
     bank: BankSchema,
     number: z.string().min(5, "Acct Number should be atleast 5 chars").max(19),
@@ -68,19 +69,20 @@ export const BankAcctFormSchema = z
 
 export type BankAcctFormData = z.infer<typeof BankAcctFormSchema>;
 
-export const formDefaultValues = (
+export const acctFormDefaultValues = (
   action: FormAction,
   acct?: APIBankAcctResponse
 ) => ({
-  id: acct ? acct.id : "",
+  id: !!acct ? acct.id : "",
   action,
-  type: acct
+  defaultAcct: !!acct?.defaultAcct,
+  type: !!acct
     ? { value: acct.bank.type as AcctType, label: acct.bank.type as AcctType }
     : { value: AcctType.Savings, label: AcctType.Savings },
-  bank: acct
+  bank: !!acct
     ? { value: acct.bank.id, label: acct.bank.name }
     : { value: defaultBank!.id, label: defaultBank!.name },
-  number: acct ? acct.number : "",
-  balance: acct ? acct.balance : 0,
-  currvalue: acct ? acct.currvalue : 0,
+  number: !!acct ? acct.number : "",
+  balance: !!acct ? acct.balance : 0,
+  currvalue: !!acct ? acct.currvalue : 0,
 });
